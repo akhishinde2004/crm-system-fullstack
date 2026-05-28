@@ -1,25 +1,30 @@
 package com.crm.service;
-import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EmailService {
-    
-    private final JavaMailSender mailSender;
-    
-    @Value("${spring.mail.username}")
+
+    @Autowired(required = false)
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username:}")
     private String fromEmail;
-    
-    @Value("${app.frontend.url}")
+
+    @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
-    
+
     public void sendPasswordResetEmail(String toEmail, String userName, String resetToken) {
+        if (mailSender == null) {
+            log.warn("Mail sender not configured. Skipping password reset email to: {}", toEmail);
+            return;
+        }
         try {
             String resetUrl = frontendUrl + "/reset-password?token=" + resetToken;
             SimpleMailMessage message = new SimpleMailMessage();
@@ -34,11 +39,14 @@ public class EmailService {
             log.info("Password reset email sent to: {}", toEmail);
         } catch (Exception e) {
             log.error("Failed to send email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send email");
         }
     }
-    
+
     public void sendWelcomeEmail(String toEmail, String userName) {
+        if (mailSender == null) {
+            log.warn("Mail sender not configured. Skipping welcome email to: {}", toEmail);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
