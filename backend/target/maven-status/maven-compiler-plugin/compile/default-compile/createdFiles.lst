@@ -1,0 +1,6 @@
+com\crm\dto\LoginRequest.class
+com\crm\dto\LoginRequest$LoginRequestBuilder.class
+com\crm\controller\ActivityController.class
+com\crm\config\AdminInitializer.class
+com\crm\config\SampleDataInitializer.class
+com\crm\service\DeduplicationService.class
